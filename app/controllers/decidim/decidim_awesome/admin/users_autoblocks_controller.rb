@@ -166,6 +166,7 @@ module Decidim
           rules_headers = calculations.headers.grep(/ - \d+/)
           counts = rules_headers.index_with { |rule_header| calculations.count { |row| row[rule_header].to_i.positive? } }
 
+          @calculations_path = calculations_path
           @threshold_detected_cases = calculations.count { |row| row["total_score"].to_i >= current_config.threshold }
           @scores_counts = counts.transform_keys { |k| k.split(" - ").last.to_i }
         end
