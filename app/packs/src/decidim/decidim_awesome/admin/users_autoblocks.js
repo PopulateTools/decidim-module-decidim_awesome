@@ -1,5 +1,3 @@
-import createDynamicFields from "src/decidim/admin/dynamic_fields.component"
-
 document.addEventListener("DOMContentLoaded", () => {
   const configCheckBox = document.getElementById("users_autoblocks_config_perform_block");
 
