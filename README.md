@@ -425,6 +425,30 @@ System configuration:
 ![Removing an authorization](examples/manual_verifications_2.png)
 ![Creating an authorization](examples/manual_verifications_3.png)
 
+#### 22. Users Automatic Blocks
+Automatically block users based on activities or suspicious data using customizable rules. 
+![treshold_actions](https://github.com/user-attachments/assets/6138226b-e33e-4e15-838b-452e80853b40)
+
+##### 1) Add Rules
+Define how and when each rule applies:
+- About user section is blank
+- User has not created content
+- Comments or about section contains links
+- User email is not confirmed
+- Email domain included in the list (can also act as an allow/block list)
+![new_rule](https://github.com/user-attachments/assets/cfd5c2fe-6ae8-4680-8683-35c7d5546f52)
+
+##### 2) Define the Threshold
+Each rule contributes weight to the "spam risk index," and users who exceed the defined threshold can be blocked.
+For example, if the threshold is set to "6" and each of the two defined rules has a weight of 5, both conditions must be met for a user to be flagged, as shown in the example screenshot.
+
+##### 3) Possible Actions
+- If "Perform users blocking" is unchecked: Calculates scores and generates a CSV with flagged users for review.
+- If checked: Prompts for confirmation, blocks flagged users, and generates a CSV with blocked users.
+
+##### Recommendation:
+Review the CSV of flagged users before confirming to block them. However, blocked users can still be reviewed and unblocked later through Global Moderation > Blocked Users (/admin/moderated_users?blocked=true).
+
 #### To be continued...
 
 We're not done! Please check the [issues](/decidim-ice/decidim-module-decidim_awesome/issues) (and participate) to see what's on our mind
