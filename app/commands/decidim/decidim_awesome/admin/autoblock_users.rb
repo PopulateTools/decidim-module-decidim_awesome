@@ -4,6 +4,8 @@ module Decidim
   module DecidimAwesome
     module Admin
       class AutoblockUsers < Command
+        include Decidim::TranslatableAttributes
+
         # Public: Initializes the command.
         #
         def initialize(form)
@@ -29,7 +31,7 @@ module Decidim
             send_notification_to_admins! if detected_users.exists?
           end
 
-          broadcast(:ok, detected_users.count, perform_block)
+          broadcast(:ok, detected_users.length, perform_block)
         rescue StandardError => e
           broadcast(:invalid, e.message)
         end
