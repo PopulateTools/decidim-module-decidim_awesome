@@ -6,12 +6,15 @@ module Decidim
     # Decorator for users
     #
     class UserAutoblockScoresPresenter < SimpleDelegator
+      class SkipItem < StandardError; end
+
       USERS_AUTOBLOCKS_TYPES = {
         "about_blank" => { has_variable: false, default_blocklist: true },
         "activities_blank" => { has_variable: false, default_blocklist: true },
         "links_in_comments_or_about" => { has_variable: true, default_blocklist: true },
         "email_unconfirmed" => { has_variable: true, default_blocklist: true },
-        "email_domain" => { has_variable: true, default_blocklist: true }
+        "email_domain" => { has_variable: true, default_blocklist: true },
+        "links_in_comments_or_about_with_domains" => { has_variable: true, default_blocklist: true }
       }.freeze
 
       def scores
@@ -31,6 +34,13 @@ module Decidim
       end
 
       def links_in_comments_or_about_detection_method(allowlist:, blocklist:)
+        email_domain_detection_method(allowlist:, blocklist:, skip_with_blank_lists: false) && (
+          LinksParser.new(about).has_blocked_links? ||
+          Decidim::Comments::Comment.where(author: self).any? { |comment| LinksParser.new(comment.translated_body).has_blocked_links? }
+        )
+      end
+
+      def links_in_comments_or_about_with_domains_detection_method(allowlist:, blocklist:)
         LinksParser.new(about, allowlist:, blocklist:).has_blocked_links? ||
           Decidim::Comments::Comment.where(author: self).any? { |comment| LinksParser.new(comment.translated_body, allowlist:, blocklist:).has_blocked_links? }
       end
@@ -40,17 +50,21 @@ module Decidim
       end
 
       def email_domain_detection_method(allowlist:, blocklist:, skip_with_blank_lists: true)
-        return if skip_with_blank_lists && allowlist.blank? && blocklist.blank?
+        return !skip_with_blank_lists if allowlist.blank? && blocklist.blank?
 
         email_domain = email.split("@").last
-        email_domain.blank? ||
-          (
-            (allowlist.all? { |name| name != email_domain }) &&
-            (blocklist.blank? || blocklist.any? { |name| name == email_domain })
-          )
+
+        raise SkipItem if blocklist.present? && !included_in_list?(email_domain, blocklist)
+        raise SkipItem if allowlist.present? && included_in_list?(email_domain, allowlist)
+
+        !included_in_list?(email_domain, allowlist) && (blocklist.blank? || included_in_list?(email_domain, blocklist))
       end
 
       private
+
+      def included_in_list?(domain, list)
+        list.any? { |name| name == domain }
+      end
 
       def current_rules
         @current_rules ||= (AwesomeConfig.find_by(var: :users_autoblocks, organization:)&.value || [])
@@ -59,8 +73,21 @@ module Decidim
       def rule_key(rule)
         [
           I18n.t(rule["type"], scope: "decidim.decidim_awesome.admin.users_autoblocks.form.types"),
+          rule_lists(rule),
           rule["id"]
-        ].join(" - ")
+        ].compact_blank.join(" - ")
+      end
+
+      def rule_lists(rule)
+        return if rule["allowlist"].blank? && rule["blocklist"].blank?
+
+        scope = "decidim.decidim_awesome.admin.users_autoblocks.index.headers"
+        lists = []
+        lists << "#{I18n.t("allowlist", scope:)}: #{rule["allowlist"].split(/\s/).compact_blank.join(", ")}" if rule["allowlist"].present?
+        lists << "#{I18n.t("blocklist", scope:)}: #{rule["blocklist"].split(/\s/).compact_blank.join(", ")}" if rule["blocklist"].present?
+        return if lists.blank?
+
+        lists.join(" | ")
       end
 
       def rule_value(rule)
@@ -68,6 +95,8 @@ module Decidim
 
         return rule["weight"] if (rule["application_type"] == "positive" && positive) || (rule["application_type"] == "negative" && !positive)
 
+        0
+      rescue SkipItem
         0
       end
 
