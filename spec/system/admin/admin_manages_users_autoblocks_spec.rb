@@ -35,7 +35,7 @@ describe "Admin manages users autoblocks feature" do
   context "when no rules exist" do
     it "hides the scores calculation form" do
       expect(page).to have_content("Users automatic blocks")
-      expect(page).not_to have_content("Calculate scores")
+      expect(page).to have_no_content("Calculate scores")
     end
   end
 
@@ -68,7 +68,7 @@ describe "Admin manages users autoblocks feature" do
     context "when performing the scores calculation" do
       before do
         fill_in "Threshold", with: "5"
-        click_button "Calculate scores"
+        click_on "Calculate scores"
       end
 
       it "displays a message with found users count" do
@@ -86,11 +86,67 @@ describe "Admin manages users autoblocks feature" do
         check "Perform users blocking"
       end
 
-      it "displays a mandatory field with block justification message" do
-        expect(page).to have_field(name: "users_autoblocks_config[block_justification_message]", visible: :visible)
-        accept_confirm { click_button "Detect and block users" }
-        within "label[for='users_autoblocks_config_block_justification_message']" do
-          expect(page).to have_content("There is an error in this field.")
+      context "and notify blocked users is not checked" do
+        it "the block task can be performed without filling a justification message" do
+          expect(page).to have_no_field(name: "users_autoblocks_config[block_justification_message]", visible: :visible)
+          accept_confirm { click_on "Detect and block users" }
+          expect(page).to have_no_content "Validation failed"
+
+          expect(Decidim::User.blocked.count).to eq(1)
+        end
+      end
+
+      context "and notify blocked users is checked" do
+        before do
+          check "Notify blocked users"
+        end
+
+        it "displays a mandatory field with block justification message" do
+          expect(page).to have_field(name: "users_autoblocks_config[block_justification_message]", visible: :visible)
+          accept_confirm { click_on "Detect and block users" }
+          within "label[for='users_autoblocks_config_block_justification_message']" do
+            expect(page).to have_content("There is an error in this field.")
+          end
+        end
+      end
+    end
+
+    context "when enabling the option to allow performing the block from a scheduled task" do
+      before do
+        fill_in "Threshold", with: "5"
+        check "Allow to perform the configured users block from a task"
+      end
+
+      context "and notify blocked users is not checked" do
+        it "the scores calculation can be performed and the configuration saved including the id of the admin without filling a justification message" do
+          expect(page).to have_no_field(name: "users_autoblocks_config[block_justification_message]", visible: :visible)
+          click_on "Calculate scores"
+
+          expect(page).to have_no_content "Validation failed"
+          expect(page).to have_content "1 user found with enough score to be blocked"
+
+          stored_config = Decidim::DecidimAwesome::AwesomeConfig.find_by(var: "users_autoblocks_config", organization:).value
+          expect(stored_config["threshold"]).to eq(5)
+          expect(stored_config["admin_id"]).to eq(admin.id)
+          expect(stored_config["allow_performing_block_from_a_task"]).to be(true)
+          expect(stored_config["notify_blocked_users"]).to be(false)
+
+          expect(Decidim::User.blocked.count).to be_zero
+        end
+      end
+
+      context "and notify blocked users is checked" do
+        before do
+          check "Notify blocked users"
+        end
+
+        it "displays a mandatory field with block justification message" do
+          expect(page).to have_field(name: "users_autoblocks_config[block_justification_message]", visible: :visible)
+          click_on "Calculate scores"
+
+          within "label[for='users_autoblocks_config_block_justification_message']" do
+            expect(page).to have_content("There is an error in this field.")
+          end
         end
       end
     end
@@ -103,13 +159,14 @@ describe "Admin manages users autoblocks feature" do
 
         fill_in "Threshold", with: "5"
         check "Perform users blocking"
+        check "Notify blocked users"
         fill_in "Block justification message", with: "Your account has been blocked due to suspicious activity"
-        accept_confirm { click_button "Detect and block users" }
+        accept_confirm { click_on "Detect and block users" }
       end
 
       context "with about user blank rule" do
         it "detects and blocks the user" do
-          expect(page).not_to have_content "Validation failed"
+          expect(page).to have_no_content "Validation failed"
 
           expect(Decidim::User.blocked.count).to eq(1)
           expect(user_with_blank_about.reload).to be_blocked
@@ -121,8 +178,9 @@ describe "Admin manages users autoblocks feature" do
       before do
         fill_in "Threshold", with: "5"
         check "Perform users blocking"
+        check "Notify blocked users"
         fill_in "Block justification message", with: "Your account has been blocked due to suspicious activity"
-        accept_confirm { click_button "Detect and block users" }
+        accept_confirm { click_on "Detect and block users" }
       end
 
       context "with about user blank rule" do
