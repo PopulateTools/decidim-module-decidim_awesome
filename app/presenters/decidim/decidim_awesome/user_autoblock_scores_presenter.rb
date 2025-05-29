@@ -133,7 +133,7 @@ module Decidim
         end
 
         def links
-          @links ||= Nokogiri::HTML(Decidim::ContentProcessor.render(@sanitized_text)).css("a").map { |link| link["href"].presence }.compact
+          @links ||= (sanitized_text_links + raw_text_links).compact
         end
 
         def has_blocked_links?
@@ -146,6 +146,14 @@ module Decidim
           return link unless UNWISE_REGEXP.match?(link)
 
           link.split(UNWISE_REGEXP).first
+        end
+
+        def sanitized_text_links
+          Nokogiri::HTML(Decidim::ContentProcessor.render(@sanitized_text)).css("a").map { |link| link["href"].presence }
+        end
+
+        def raw_text_links
+          Nokogiri::HTML(Decidim::ContentProcessor.render(@text)).css("a").map { |link| link["href"].presence }
         end
       end
 
