@@ -14,11 +14,11 @@ namespace :decidim_decidim_awesome do
 
       Decidim::Organization.find_each do |current_organization|
         if (current_config = organization_config(current_organization)).blank?
-          puts "\nSkipping #{current_organization.name}...\n"
+          puts "\nSkipping #{organization_name(current_organization)}...\n"
           next
         end
 
-        puts "\nRunning on #{current_organization.name}...\n"
+        puts "\nRunning on #{organization_name(current_organization)}...\n"
 
         config_data = OpenStruct.new(current_config.value || {})
         config_form = Decidim::DecidimAwesome::Admin::UsersAutoblocksConfigForm.from_model(config_data).with_context(current_organization:, current_user:)
@@ -44,11 +44,11 @@ namespace :decidim_decidim_awesome do
         end
 
         if skip_organization
-          puts "\nSkipping #{current_organization.name}...\n"
+          puts "\nSkipping #{organization_name(current_organization)}...\n"
           next
         end
 
-        puts "\nRunning on #{current_organization.name}...\n"
+        puts "\nRunning on #{organization_name(current_organization)}...\n"
 
         config_data = OpenStruct.new(current_config.value || {})
         config_form = Decidim::DecidimAwesome::Admin::UsersAutoblocksConfigForm.from_model(config_data).with_context(current_organization:, current_user:)
@@ -80,6 +80,10 @@ namespace :decidim_decidim_awesome do
 
     def organization_config(organization)
       Decidim::DecidimAwesome::AwesomeConfig.find_by(var: :users_autoblocks_config, organization:)
+    end
+
+    def organization_name(organization)
+      (organization.name || {})[organization.default_locale.to_s]
     end
   end
 end
