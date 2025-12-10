@@ -62,6 +62,18 @@ ca:
         awesome_admins_available_authorizations: Permet a les administradores verificar manualment a les participants amb aquests verificadors
       user:
         user_time_zone: Zona horària personal
+      users_autoblocks:
+        allowlist: Llista de permesos
+        application_type: Seleccionar aplicació
+        blocklist: Llista de bloquejats
+        type: Regla
+        weight: Aplicar pes
+      users_autoblocks_config:
+        allow_performing_block_from_a_task: Permetre realitzar el bloqueig d'usuaris configurat des d'una tasca
+        block_justification_message: Missatge de justificació del bloqueig
+        notify_blocked_users: Notificar als usuaris bloquejats
+        perform_block: Realitzar bloqueig d'usuaris
+        threshold: Llindar
   decidim:
     admin:
       actions:
@@ -464,6 +476,7 @@ ca:
           proposals: Modificacions a propostes
           styles: Estils personalitzats
           surveys: Formularis i enquestes
+          users_autoblocks: Bloquejos automàtics d'usuaris
           verifications: Verificacions
         menu_hacks:
           create:
@@ -555,6 +568,89 @@ ca:
         scoped_styles:
           menu:
             title: Interfície pública
+        users_autoblocks:
+          calculate_scores:
+            error: 'S''ha produït un error en intentar calcular les puntuacions! %{error}'
+            success:
+              one: Puntuacions calculades amb èxit, 1 usuari detectat. S'ha enviat un CSV detallat a les administradores per correu electrònic
+              other: Puntuacions calculades amb èxit, %{count} usuaris detectats. S'ha enviat un CSV detallat a les administradores per correu electrònic
+              zero: Puntuacions calculades amb èxit. No s'han trobat usuaris amb una puntuació suficient per ser bloquejats automàticament
+          config_form:
+            allow_performing_block_from_a_task_help: S'ha d'afegir una línia al servidor per realitzar la tasca. Per fer-ho, programeu un `bundle exec rake decidim_decidim_awesome:autoblock_users:run_scheduled_block` periòdicament.
+            block_justification_message_help: Justificació que rebran els usuaris detectats en la seva notificació de bloqueig
+            notify_blocked_users_help: Notificar a cada usuari bloquejat. Tingueu en compte que si hi ha molts usuaris per bloquejar, generar una notificació per a cadascun pot consumir molts recursos
+            perform_block_message_help: Bloquejar automàticament els usuaris que superin el llindar
+            threshold_config_detected_cases: 'Nombre de casos que arriben al llindar: %{count}'
+            threshold_config_help: Defineix el llindar numèric (igual o major que) de l'"índex de risc de spam" per al bloqueig automàtic d'usuaris
+          create:
+            error: 'Error en crear la regla! %{error}'
+            success: Regla creada amb èxit
+          destroy:
+            error: 'Error en eliminar la regla! %{error}'
+            success: Regla eliminada amb èxit
+          detect_and_run:
+            error: 'S''ha produït un error en intentar bloquejar usuaris!<br/>%{error}'
+            success_block_html:
+              one: 1 usuari bloquejat amb èxit. Podeu comprovar-ho a <a href="%{url}">usuaris bloquejats</a>
+              other: '%{count} usuaris bloquejats amb èxit. Podeu comprovar-ho a <a href="%{url}">usuaris bloquejats</a>'
+              zero: No s'han trobat usuaris amb una puntuació suficient per ser bloquejats automàticament
+            success_scores_calculation:
+              one: 1 usuari trobat amb puntuació suficient per ser bloquejat
+              other: "%{count} usuaris trobats amb puntuació suficient per ser bloquejats"
+              zero: No s'han trobat usuaris amb una puntuació suficient per ser bloquejats automàticament
+          edit:
+            title: Editar bloqueig automàtic d'usuaris
+            update: Actualitzar
+          form:
+            application_types:
+              negative: Quan la condició de la regla no es compleix
+              positive: Quan la condició de la regla es compleix
+            types:
+              about_blank: La secció "Sobre" de l'usuari està buida
+              activities_blank: L'usuari no ha creat continguts
+              email_domain: El domini del correu electrònic està inclòs a la llista
+              email_unconfirmed: El correu electrònic de l'usuari no està confirmat
+              links_in_comments_or_about: Els comentaris o la secció "Sobre" contenen enllaços
+              links_in_comments_or_about_with_domains: Els comentaris o la secció "Sobre" contenen enllaços amb dominis en llistes de permesos o bloquejats
+            types_long:
+              about_blank: La secció "Sobre" de l'usuari està buida (les llistes de permesos i bloquejats s'apliquen al domini del correu electrònic de l'usuari)
+              activities_blank: L'usuari no ha creat continguts (les llistes de permesos i bloquejats s'apliquen al domini del correu electrònic de l'usuari)
+              email_domain: El domini del correu electrònic està inclòs a la llista (les llistes de permesos i bloquejats s'apliquen al domini del correu electrònic de l'usuari)
+              email_unconfirmed: El correu electrònic de l'usuari no està confirmat (les llistes de permesos i bloquejats s'apliquen al domini del correu electrònic de l'usuari)
+              links_in_comments_or_about: Els comentaris o la secció "Sobre" contenen enllaços (les llistes de permesos i bloquejats s'apliquen al domini del correu electrònic de l'usuari)
+              links_in_comments_or_about_with_domains: Els comentaris o la secció "Sobre" contenen enllaços (les llistes de permesos i bloquejats s'apliquen als enllaços trobats)
+            variables_help:
+              allow_domains_list: La regla NO s'aplica a aquesta llista de dominis (separats per espais)
+              block_domains_list: La regla només s'aplica a aquesta llista de dominis (separats per espais)
+          index:
+            allow: Permetre
+            block: Bloquejar
+            calculate_scores: Calcular puntuacions
+            confirm_block: 'Esteu segures que voleu bloquejar usuaris automàticament?'
+            confirm_destroy: 'Esteu segures que voleu eliminar aquesta regla de bloqueig automàtic d''usuaris?'
+            delete: Eliminar regla
+            description: 'Bloquejar usuaris automàticament en funció de les seves activitats o dades sospitosos
+
+              '
+            detect_and_run: Detectar i bloquejar usuaris
+            download_report_file: Descarregar fitxer d'informe de càlculs
+            edit: Editar regla
+            headers:
+              allowlist: La regla NO s'aplica als dominis
+              application_type: Tipus d'aplicació
+              blocklist: La regla s'aplica als dominis
+              count: Casos detectats
+              type: Regla
+              weight: Pes
+            new: Nova regla
+            title: Bloquejos automàtics d'usuaris
+          new:
+            create: Crear
+            title: Nou bloqueig automàtic d'usuaris
+          report_file_no_exists: El fitxer d'informe no existeix. Feu clic a Calcular puntuacions per crear-lo.
+          update:
+            error: 'Error en actualitzar la regla! %{error}'
+            success: Regla actualitzada amb èxit
         visibility:
           info_html: Podeu gestionar restriccions d'accés addicionals mitjançant verificacions amb %{awesome_link}.
           restricted_html: Aquest espai utilitza restriccions d'accés addicionals amb %{awesome_link}.
@@ -652,6 +748,16 @@ ca:
             Les administradores podran verificar manualment els participants amb aquests verificadors.
             <br>Utilitzeu aquesta funció amb precaució, ja que pot provocar problemes de seguretat.
           awesome_tweaks: Configuracions del Decidim Awesome
+      users_autoblocks_report_mailer:
+        notify:
+          body_calculated: Hi ha %{count} usuaris que han estat detectats per bloquejar. El bloqueig automàtic encara no s'ha realitzat.
+          body_check_html: Podeu comprovar-ho a <a href="%{url}">usuaris bloquejats</a>.
+          body_performed: Hi ha %{count} usuaris que han estat bloquejats automàticament.
+          details: Justificació enviada als usuaris bloquejats
+          greetings: Salutacions,<br/>%{organization_name}<br/><a href="%{organization_url}">%{organization_url}</a>
+          hello: Hola %{admin},
+          subject_calculated: Usuaris detectats per bloquejar a %{organization_name}
+          subject_performed: Usuaris bloquejats automàticament a %{organization_name}
       validators:
         too_much_caps: Fa servir massa lletres majúscules (més %{percent}% del text)
       voting:

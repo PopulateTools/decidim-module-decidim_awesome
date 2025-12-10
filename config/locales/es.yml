@@ -62,6 +62,18 @@ es:
         awesome_admins_available_authorizations: Permitir a las administradoras verificar manualmente los participantes con estos verificadores
       user:
         user_time_zone: Zona horaria personal
+      users_autoblocks:
+        allowlist: Lista de permitidos
+        application_type: Seleccionar aplicación
+        blocklist: Lista de bloqueados
+        type: Regla
+        weight: Aplicar peso
+      users_autoblocks_config:
+        allow_performing_block_from_a_task: Permitir realizar el bloqueo de usuarios configurado desde una tarea
+        block_justification_message: Mensaje de justificación del bloqueo
+        notify_blocked_users: Notificar a los usuarios bloqueados
+        perform_block: Realizar bloqueo de usuarios
+        threshold: Umbral
   decidim:
     admin:
       actions:
@@ -465,6 +477,7 @@ es:
           proposals: Modificaciones a las propuestas
           styles: Estilos personalizados
           surveys: Encuestas y formularios
+          users_autoblocks: Bloqueos automáticos de usuarios
           verifications: Verificaciones
         menu_hacks:
           create:
@@ -556,6 +569,89 @@ es:
         scoped_styles:
           menu:
             title: Interfaz pública
+        users_autoblocks:
+          calculate_scores:
+            error: '¡Ha ocurrido un error al intentar calcular las puntuaciones! %{error}'
+            success:
+              one: Puntuaciones calculadas con éxito, 1 usuario detectado. Se ha enviado un CSV detallado a las administradoras por correo electrónico
+              other: Puntuaciones calculadas con éxito, %{count} usuarios detectados. Se ha enviado un CSV detallado a las administradoras por correo electrónico
+              zero: Puntuaciones calculadas con éxito. No se han encontrado usuarios con una puntuación suficiente para ser bloqueados automáticamente
+          config_form:
+            allow_performing_block_from_a_task_help: Se debe añadir una línea al servidor para realizar la tarea. Para hacer esto, programa un `bundle exec rake decidim_decidim_awesome:autoblock_users:run_scheduled_block` periódicamente.
+            block_justification_message_help: Justificación que recibirán los usuarios detectados en su notificación de bloqueo
+            notify_blocked_users_help: Notificar a cada usuario bloqueado. Ten en cuenta que si hay muchos usuarios para bloquear, generar una notificación para cada uno puede consumir muchos recursos
+            perform_block_message_help: Bloquear automáticamente a los usuarios que superen el umbral
+            threshold_config_detected_cases: 'Número de casos que alcanzan el umbral: %{count}'
+            threshold_config_help: Define el umbral numérico (igual o mayor que) del "índice de riesgo de spam" para el bloqueo automático de usuarios
+          create:
+            error: '¡Error al crear la regla! %{error}'
+            success: Regla creada con éxito
+          destroy:
+            error: '¡Error al eliminar la regla! %{error}'
+            success: Regla eliminada con éxito
+          detect_and_run:
+            error: '¡Ha ocurrido un error al intentar bloquear usuarios!<br/>%{error}'
+            success_block_html:
+              one: 1 usuario bloqueado con éxito. Puedes comprobarlo en <a href="%{url}">usuarios bloqueados</a>
+              other: '%{count} usuarios bloqueados con éxito. Puedes comprobarlo en <a href="%{url}">usuarios bloqueados</a>'
+              zero: No se han encontrado usuarios con una puntuación suficiente para ser bloqueados automáticamente
+            success_scores_calculation:
+              one: 1 usuario encontrado con puntuación suficiente para ser bloqueado
+              other: "%{count} usuarios encontrados con puntuación suficiente para ser bloqueados"
+              zero: No se han encontrado usuarios con una puntuación suficiente para ser bloqueados automáticamente
+          edit:
+            title: Editar bloqueo automático de usuarios
+            update: Actualizar
+          form:
+            application_types:
+              negative: Cuando la condición de la regla no se cumple
+              positive: Cuando la condición de la regla se cumple
+            types:
+              about_blank: La sección "Acerca de" del usuario está vacía
+              activities_blank: El usuario no ha creado contenidos
+              email_domain: El dominio del correo electrónico está incluido en la lista
+              email_unconfirmed: El correo electrónico del usuario no está confirmado
+              links_in_comments_or_about: Los comentarios o la sección "Acerca de" contienen enlaces
+              links_in_comments_or_about_with_domains: Los comentarios o la sección "Acerca de" contienen enlaces con dominios en listas de permitidos o bloqueados
+            types_long:
+              about_blank: La sección "Acerca de" del usuario está vacía (las listas de permitidos y bloqueados se aplican al dominio del correo electrónico del usuario)
+              activities_blank: El usuario no ha creado contenidos (las listas de permitidos y bloqueados se aplican al dominio del correo electrónico del usuario)
+              email_domain: El dominio del correo electrónico está incluido en la lista (las listas de permitidos y bloqueados se aplican al dominio del correo electrónico del usuario)
+              email_unconfirmed: El correo electrónico del usuario no está confirmado (las listas de permitidos y bloqueados se aplican al dominio del correo electrónico del usuario)
+              links_in_comments_or_about: Los comentarios o la sección "Acerca de" contienen enlaces (las listas de permitidos y bloqueados se aplican al dominio del correo electrónico del usuario)
+              links_in_comments_or_about_with_domains: Los comentarios o la sección "Acerca de" contienen enlaces (las listas de permitidos y bloqueados se aplican a los enlaces encontrados)
+            variables_help:
+              allow_domains_list: La regla NO se aplica a esta lista de dominios (separados por espacios)
+              block_domains_list: La regla solo se aplica a esta lista de dominios (separados por espacios)
+          index:
+            allow: Permitir
+            block: Bloquear
+            calculate_scores: Calcular puntuaciones
+            confirm_block: '¿Estás segura de que desea bloquear usuarios automáticamente?'
+            confirm_destroy: '¿Estás segura de que desea eliminar esta regla de bloqueo automático de usuarios?'
+            delete: Eliminar regla
+            description: 'Bloquear usuarios automáticamente en función de sus actividades o datos sospechosos
+
+              '
+            detect_and_run: Detectar y bloquear usuarios
+            download_report_file: Descargar archivo de informe de cálculos
+            edit: Editar regla
+            headers:
+              allowlist: La regla NO se aplica a los dominios
+              application_type: Tipo de aplicación
+              blocklist: La regla se aplica a los dominios
+              count: Casos detectados
+              type: Regla
+              weight: Peso
+            new: Nueva regla
+            title: Bloqueos automáticos de usuarios
+          new:
+            create: Crear
+            title: Nuevo bloqueo automático de usuarios
+          report_file_no_exists: El archivo de informe no existe. Haz clic en Calcular puntuaciones para crearlo.
+          update:
+            error: '¡Error al actualizar la regla! %{error}'
+            success: Regla actualizada con éxito
         visibility:
           info_html: Puedes administrar restricciones de acceso adicionales usando verificaciones con %{awesome_link}.
           restricted_html: Este espacio está utilizando restricciones de acceso adicionales con %{awesome_link}.
@@ -653,6 +749,16 @@ es:
             Las administradoras podrán verificar manualmente a los participantes con estos verificadores.
             <br>Utilice esta función con precaución, ya que puede dar lugar a problemas de seguridad.
           awesome_tweaks: Configuraciones para Decidim Awesome
+      users_autoblocks_report_mailer:
+        notify:
+          body_calculated: Hay %{count} usuarios que han sido detectados para bloquear. El bloqueo automático aún no se ha realizado.
+          body_check_html: Puedes comprobarlo en <a href="%{url}">usuarios bloqueados</a>.
+          body_performed: Hay %{count} usuarios que han sido bloqueados automáticamente.
+          details: Justificación enviada a los usuarios bloqueados
+          greetings: Saludos,<br/>%{organization_name}<br/><a href="%{organization_url}">%{organization_url}</a>
+          hello: Hola %{admin},
+          subject_calculated: Usuarios detectados para bloquear en %{organization_name}
+          subject_performed: Usuarios bloqueados automáticamente en %{organization_name}
       validators:
         too_much_caps: Contiene demasiadas letras mayúsculas (más del %{percent}% del texto)
       voting:
