@@ -48,27 +48,28 @@ module Decidim
         def register_awesome_admin_menu!
           register_simple_entry(:awesome_admin_menu, :editors, 1, "editors-text")
           register_simple_entry(:awesome_admin_menu, :proposals, 2, "documents")
-          register_simple_entry(:awesome_admin_menu, :surveys, 3, "surveys")
-          register_simple_entry(:awesome_admin_menu, :styles, 4, "brush",
+          register_simple_entry(:awesome_admin_menu, :comments, 3, "chat-1-line")
+          register_simple_entry(:awesome_admin_menu, :surveys, 4, "surveys")
+          register_simple_entry(:awesome_admin_menu, :styles, 5, "brush",
                                 submenu: { target_menu: :custom_styles_submenu },
                                 active: [[:config_path, :scoped_styles], [:config_path, :scoped_admin_styles]])
 
-          register_simple_entry(:awesome_admin_menu, :custom_fields, 5, "layers",
+          register_simple_entry(:awesome_admin_menu, :custom_fields, 6, "layers",
                                 i18n_key: "menu.proposal_custom_fields",
                                 submenu: { target_menu: :custom_fields_submenu },
                                 active: [[:config_path, :proposal_custom_fields], [:config_path, :proposal_private_custom_fields]])
 
-          register_simple_entry(:awesome_admin_menu, :admins, 6, "group-line")
+          register_simple_entry(:awesome_admin_menu, :admins, 7, "group-line")
 
-          register_simple_entry(:awesome_admin_menu, :menu_hacks, 7, "menu-line",
+          register_simple_entry(:awesome_admin_menu, :menu_hacks, 8, "menu-line",
                                 submenu: { target_menu: :menu_hacks_submenu },
                                 active: [[:menu_hacks_path, :menu], [:menu_hacks_path, :mobile_menu], [:menu_hacks_path, :home_content_block_menu]])
 
-          register_simple_entry(:awesome_admin_menu, :custom_redirects, 8, "external-link-line")
-          register_simple_entry(:awesome_admin_menu, :livechat, 9, "chat-1-line")
-          register_simple_entry(:awesome_admin_menu, :verifications, 10, "fingerprint-line")
+          register_simple_entry(:awesome_admin_menu, :custom_redirects, 9, "external-link-line")
+          register_simple_entry(:awesome_admin_menu, :livechat, 10, "chat-1-line")
+          register_simple_entry(:awesome_admin_menu, :verifications, 11, "fingerprint-line")
 
-          register_simple_entry(:awesome_admin_menu, :maintenance, 11, "tools-line",
+          register_simple_entry(:awesome_admin_menu, :maintenance, 12, "tools-line",
                                 i18n_key: "menu.maintenance.maintenance",
                                 submenu: { target_menu: :maintenance_submenu },
                                 active: [[:private_data_path], [:hashcashes_path], [:checks_path]])
@@ -178,6 +179,7 @@ module Decidim
               :validate_body_min_length, :validate_body_max_caps_percent,
               :validate_body_max_marks_together, :validate_body_start_with_caps
             ),
+            comments: config_enabled?(:allow_attachments_in_comments),
             surveys: config_enabled?(:auto_save_forms, :user_timezone, :hashcash_signup, :hashcash_login),
             styles: first_enabled(:scoped_styles, :scoped_admin_styles),
             scoped_styles: config_enabled?(:scoped_styles),
