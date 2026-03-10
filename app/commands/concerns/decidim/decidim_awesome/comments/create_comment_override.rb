@@ -45,9 +45,9 @@ module Decidim
             @attachments_allowed ||= begin
               root_commentable = root_commentable(form.commentable)
               if root_commentable.respond_to?(:component)
-                awesome_config_instance.context_from_component(root_commentable.component)
+                awesome_config_instance.context_from_component!(root_commentable.component)
               elsif root_commentable.is_a?(Decidim::Participable)
-                awesome_config_instance.context_from_participatory_space(root_commentable)
+                awesome_config_instance.context_from_participatory_space!(root_commentable)
               end
 
               awesome_config_instance.enabled_in_context?(:allow_attachments_in_comments)

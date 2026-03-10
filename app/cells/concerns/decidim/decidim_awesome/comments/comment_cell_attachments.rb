@@ -24,11 +24,11 @@ module Decidim
             return false unless Decidim::DecidimAwesome::AwesomeConfig.find_by(var: :allow_attachments_in_comments, organization: current_organization)&.value
 
             if model.respond_to?(:component)
-              awesome_config_instance.context_from_component(model.component)
+              awesome_config_instance.context_from_component!(model.component)
             elsif model.is_a?(Decidim::Participable)
-              awesome_config_instance.context_from_participatory_space(model)
+              awesome_config_instance.context_from_participatory_space!(model)
             else
-              awesome_config_instance.context_from_request(request)
+              awesome_config_instance.context_from_request!(request)
             end
 
             awesome_config_instance.enabled_in_context?(:allow_attachments_in_comments)
